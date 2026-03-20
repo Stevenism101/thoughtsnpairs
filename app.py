@@ -9,7 +9,7 @@ login_manager = LoginManager()
 
 def create_app(config_name=None):
     if config_name is None:
-        config_name = os.environ.get('FLASK_ENV', 'development')
+        config_name = os.environ.get('APP_ENV', os.environ.get('FLASK_ENV', 'development'))
 
     app = Flask(__name__)
     app.config.from_object(config.get(config_name, config['default']))
