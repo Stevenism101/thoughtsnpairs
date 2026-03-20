@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}{{ pairing.title }} — ThoughtsNPairs{% endblock %}
+{% block content %}
+<div class="pairing-detail">
+  <div class="pairing-detail__header">
+    <h1 class="pairing-detail__title">{{ pairing.title }}</h1>
+    {% if pairing.prep_note %}
+      <div class="pairing-detail__prep">📌 {{ pairing.prep_note }}</div>
+    {% endif %}
+    <div class="pairing-detail__meta">
+      by <a href="{{ url_for('pairings.profile', username=pairing.author.username) }}">{{ pairing.author.username }}</a>
+      · {{ pairing.created_at.strftime('%b %d, %Y') }}
+    </div>
+  </div>
+
+  <p class="pairing-detail__desc">{{ pairing.description }}</p>
+
+  {% if pairing.tags %}
+    <div class="pairing-detail__tags">
+      {% for tag in pairing.tags %}
+        <a href="{{ url_for('main.explore', tag=tag.slug) }}" class="tag">{{ tag.name }}</a>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <!-- Rating widget -->
+  <div class="rating-widget" id="rating-widget" data-pairing-id="{{ pairing.id }}">
+    <div class="rating-widget__current">
+      <span class="stars stars--large" id="avg-stars">{{ pairing.stars_display() }}</span>
+      <span class="rating-widget__avg" id="avg-number">{{ pairing.avg_rating|round(1) }}</span>
+      <span class="rating-widget__count">({{ pairing.ratings.count() }} ratings)</span>
+    </div>
+
+    {% if current_user.is_authenticated %}
+      <div class="rating-widget__input">
+        <p class="rating-widget__label">Your rating:</p>
+        <div class="star-picker" id="star-picker">
+          {% for i in range(1, 6) %}
+            <button class="star-btn {% if user_rating and user_rating.score >= i %}star-btn--filled{% endif %}"
+                    data-score="{{ i }}" aria-label="{{ i }} stars">★</button>
+          {% endfor %}
+        </div>
+        {% if user_rating %}
+          <p class="rating-widget__yours">You rated this {{ user_rating.score }}/5</p>
+        {% endif %}
+      </div>
+    {% else %}
+      <div class="rating-widget__prompt">
+        <a href="{{ url_for('auth.register') }}?next={{ request.path }}" class="rating-cta">
+          Join to rate this pairing — it takes 10 seconds
+        </a>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Affiliate links -->
+  {% if affiliate_links %}
+    <div class="affiliate-section">
+      {% for link in affiliate_links %}
+        <a href="{{ url_for('api.affiliate_redirect', link_id=link.id) }}"
+           class="affiliate-btn affiliate-btn--detail" target="_blank" rel="noopener noreferrer">
+          🛒 {{ link.label }}
+        </a>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <!-- Comments -->
+  <div class="comments-section" id="comments">
+    <h2 class="comments-title">Comments ({{ comments|length }})</h2>
+
+    {% if comments %}
+      <div class="comments-list">
+        {% for comment in comments %}
+          <div class="comment">
+            <div class="comment__header">
+              <a href="{{ url_for('pairings.profile', username=comment.author.username) }}" class="comment__author">{{ comment.author.username }}</a>
+              <span class="comment__date">{{ comment.created_at.strftime('%b %d') }}</span>
+            </div>
+            <p class="comment__body">{{ comment.body }}</p>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    {% if current_user.is_authenticated %}
+      <form class="comment-form" method="POST" action="{{ url_for('pairings.comment', pairing_id=pairing.id) }}">
+        <textarea name="body" class="comment-input" placeholder="What do you think?" rows="3" required></textarea>
+        <button type="submit" class="btn btn--primary">Post</button>
+      </form>
+    {% else %}
+      <p class="comment-auth-prompt">
+        <a href="{{ url_for('auth.register') }}">Join</a> or
+        <a href="{{ url_for('auth.login') }}">sign in</a> to comment.
+      </p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

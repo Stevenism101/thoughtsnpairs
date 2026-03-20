@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block title %}Add a Pairing — Thoughts N' Pairs{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1 class="page-title">Add a Pairing</h1>
+  <p class="page-subtitle">What goes together that nobody talks about?</p>
+</div>
+
+<form class="submit-form" method="POST" action="{{ url_for('pairings.submit') }}">
+
+  <div class="form-group">
+    <label class="form-label" for="item_1">Item 1 <span class="form-required">required</span></label>
+    <input type="text" id="item_1" name="item_1" class="form-input"
+           placeholder="e.g. Oreo Cookie" required maxlength="100"
+           value="{{ request.form.get('item_1', '') }}">
+  </div>
+
+  <div class="form-divider">+</div>
+
+  <div class="form-group">
+    <label class="form-label" for="item_2">Item 2 <span class="form-hint-inline">required unless you add a prep note</span></label>
+    <input type="text" id="item_2" name="item_2" class="form-input"
+           placeholder="e.g. Crunchy Peanut Butter" maxlength="100"
+           value="{{ request.form.get('item_2', '') }}">
+  </div>
+
+  <!-- Optional items 3–7 -->
+  <div id="extra-items">
+    {% for n in [3, 4, 5, 6, 7] %}
+      <div class="extra-item {% if not request.form.get('item_' ~ n) and loop.index > 1 %}extra-item--hidden{% endif %}" id="item-row-{{ n }}">
+        <div class="form-divider">+</div>
+        <div class="form-group">
+          <label class="form-label" for="item_{{ n }}">Item {{ n }} <span class="form-hint-inline">optional</span></label>
+          <input type="text" id="item_{{ n }}" name="item_{{ n }}" class="form-input"
+                 placeholder="Another item…" maxlength="100"
+                 value="{{ request.form.get('item_' ~ n, '') }}">
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  <button type="button" class="btn btn--ghost btn--sm" id="add-item-btn" style="margin-bottom:18px;">+ Add another item</button>
+
+  <div class="form-group">
+    <label class="form-label" for="prep_note">Prep note <span class="form-hint-inline">optional — counts as your second required detail</span></label>
+    <input type="text" id="prep_note" name="prep_note" class="form-input"
+           placeholder="e.g. Microwave 5 seconds first · Put in freezer overnight · Use room temp"
+           maxlength="200"
+           value="{{ request.form.get('prep_note', '') }}">
+    <span class="form-hint">A specific action, timing, or condition that makes the pairing work.</span>
+  </div>
+
+  <div class="form-divider form-divider--line"></div>
+
+  <div class="form-group">
+    <label class="form-label" for="description">Why does it work? <span class="form-required">required</span></label>
+    <textarea id="description" name="description" class="form-textarea"
+              placeholder="Tell us about the flavors, textures, the whole vibe. Be specific."
+              rows="5" required maxlength="1000">{{ request.form.get('description', '') }}</textarea>
+    <span class="form-hint">Flavor contrast? Texture play? Temperature shift? The more specific, the better.</span>
+  </div>
+
+  <div class="form-group">
+    <label class="form-label">Tags <span class="form-hint-inline">pick all that apply</span></label>
+    <div class="tag-picker">
+      {% for tag in tags %}
+        <label class="tag-option">
+          <input type="checkbox" name="tags" value="{{ tag.id }}"
+                 {% if tag.id|string in request.form.getlist('tags') %}checked{% endif %}>
+          <span class="tag-option__label">{{ tag.name }}</span>
+        </label>
+      {% endfor %}
+    </div>
+  </div>
+
+  <button type="submit" class="btn btn--primary btn--full">Submit Pairing</button>
+</form>
+
+<script>
+(function () {
+  var rows = [3, 4, 5, 6, 7];
+  var visibleCount = 0;
+
+  // Find how many are already visible (from form re-render)
+  rows.forEach(function (n) {
+    var row = document.getElementById('item-row-' + n);
+    if (row && !row.classList.contains('extra-item--hidden')) visibleCount++;
+  });
+
+  var btn = document.getElementById('add-item-btn');
+
+  function showNext() {
+    for (var i = 0; i < rows.length; i++) {
+      var row = document.getElementById('item-row-' + rows[i]);
+      if (row && row.classList.contains('extra-item--hidden')) {
+        row.classList.remove('extra-item--hidden');
+        visibleCount++;
+        if (visibleCount >= rows.length) btn.style.display = 'none';
+        return;
+      }
+    }
+    btn.style.display = 'none';
+  }
+
+  btn.addEventListener('click', showNext);
+  if (visibleCount >= rows.length) btn.style.display = 'none';
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Sign In — ThoughtsNPairs{% endblock %}
+{% block content %}
+<div class="auth-card">
+  <h1 class="auth-title">Sign In</h1>
+  <form method="POST" action="{{ url_for('auth.login') }}{% if request.args.get('next') %}?next={{ request.args.get('next') }}{% endif %}">
+    <div class="form-group">
+      <label class="form-label" for="username">Username</label>
+      <input type="text" id="username" name="username" class="form-input" autocomplete="username" required>
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="password">Password</label>
+      <input type="password" id="password" name="password" class="form-input" autocomplete="current-password" required>
+    </div>
+    <button type="submit" class="btn btn--primary btn--full">Sign In</button>
+  </form>
+  <p class="auth-switch">No account? <a href="{{ url_for('auth.register') }}">Join — it's free</a></p>
+</div>
+{% endblock %}

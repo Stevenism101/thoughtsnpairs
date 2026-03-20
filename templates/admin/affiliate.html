@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Affiliate Manager — ThoughtsNPairs{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1 class="page-title">Affiliate Manager</h1>
+</div>
+
+{% if pending_suggestions %}
+  <h2 class="section-title">AI Suggestions to Review</h2>
+  {% for link in pending_suggestions %}
+    <div class="affiliate-card">
+      <div class="affiliate-card__label">{{ link.label }}</div>
+      <div class="affiliate-card__meta">{{ link.retailer }} · {{ link.pairing.title }}</div>
+      <div class="affiliate-card__url">{{ link.url[:60] }}{% if link.url|length > 60 %}…{% endif %}</div>
+      <form method="POST" action="{{ url_for('admin.approve_affiliate', link_id=link.id) }}">
+        <button type="submit" class="btn btn--approve">Approve</button>
+      </form>
+    </div>
+  {% endfor %}
+{% endif %}
+
+<h2 class="section-title">Pairings Without Affiliate Links</h2>
+{% if pairings_no_links %}
+  {% for pairing in pairings_no_links %}
+    <div class="affiliate-card">
+      <div class="affiliate-card__pairing">{{ pairing.item_1 }} + {{ pairing.item_2 }}</div>
+      <div class="affiliate-card__meta">{{ pairing.view_count }} views</div>
+      <form class="affiliate-add-form" method="POST" action="{{ url_for('admin.add_affiliate') }}">
+        <input type="hidden" name="pairing_id" value="{{ pairing.id }}">
+        <input type="text" name="label" class="form-input form-input--sm" placeholder="Label (e.g. Oreos on Amazon)" required>
+        <input type="url" name="url" class="form-input form-input--sm" placeholder="Affiliate URL" required>
+        <input type="text" name="item_name" class="form-input form-input--sm" placeholder="Product name">
+        <select name="retailer" class="form-input form-input--sm">
+          <option value="amazon">Amazon</option>
+          <option value="walmart">Walmart</option>
+          <option value="brand">Brand Direct</option>
+        </select>
+        <button type="submit" class="btn btn--primary btn--sm">Add Link</button>
+      </form>
+    </div>
+  {% endfor %}
+{% else %}
+  <div class="empty-state">
+    <p>All approved pairings have affiliate links.</p>
+  </div>
+{% endif %}
+{% endblock %}

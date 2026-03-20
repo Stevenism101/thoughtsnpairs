@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}{{ profile_user.username }} — ThoughtsNPairs{% endblock %}
+{% block content %}
+<div class="profile-header">
+  <div class="profile-avatar">{{ profile_user.username[0].upper() }}</div>
+  <h1 class="profile-username">{{ profile_user.username }}</h1>
+  {% if profile_user.bio %}
+    <p class="profile-bio">{{ profile_user.bio }}</p>
+  {% endif %}
+  <div class="profile-stats">
+    <span>{{ pairings|length }} pairings</span>
+    <span>Joined {{ profile_user.created_at.strftime('%b %Y') }}</span>
+  </div>
+</div>
+
+{% if pairings %}
+  <div class="feed">
+    {% for pairing in pairings %}
+      <div class="pairing-card">
+        <a href="{{ url_for('pairings.view', slug=pairing.slug) }}" class="pairing-link">
+          <div class="pairing-items">{{ pairing.item_1 }} + {{ pairing.item_2 }}</div>
+          <p class="pairing-desc">{{ pairing.description[:100] }}{% if pairing.description|length > 100 %}…{% endif %}</p>
+          <div class="pairing-meta">
+            <span class="stars">{{ pairing.stars_display() }}</span>
+            {% for tag in pairing.tags[:3] %}
+              <span class="tag">{{ tag.name }}</span>
+            {% endfor %}
+          </div>
+        </a>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="empty-state">
+    <p>No pairings yet.</p>
+    {% if current_user.is_authenticated and current_user.id == profile_user.id %}
+      <a href="{{ url_for('pairings.submit') }}" class="btn btn--primary">+ Add your first pairing</a>
+    {% endif %}
+  </div>
+{% endif %}
+{% endblock %}

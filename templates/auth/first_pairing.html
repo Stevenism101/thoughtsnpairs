@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Welcome — ThoughtsNPairs{% endblock %}
+{% block content %}
+<div class="first-pairing-screen">
+  <div class="first-pairing-emoji">🤌</div>
+  <h1 class="first-pairing-title">Nice. Now show us something good.</h1>
+  <p class="first-pairing-body">
+    Got a weird food combo that actually works?<br>
+    Something nobody talks about but everyone should try?
+  </p>
+  <div class="first-pairing-actions">
+    <a href="{{ url_for('pairings.submit') }}" class="btn btn--primary btn--full">+ Add your first pairing</a>
+    <a href="{{ url_for('main.index') }}" class="btn btn--ghost btn--full">Browse first</a>
+  </div>
+</div>
+{% endblock %}

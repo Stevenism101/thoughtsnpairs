@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Explore — ThoughtsNPairs{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1 class="page-title">Explore</h1>
+</div>
+
+<div class="filter-bar">
+  <div class="sort-tabs">
+    <a href="{{ url_for('main.explore', tag=active_tag.slug if active_tag else '', sort='top') }}"
+       class="sort-tab {% if sort == 'top' %}active{% endif %}">Top</a>
+    <a href="{{ url_for('main.explore', tag=active_tag.slug if active_tag else '', sort='new') }}"
+       class="sort-tab {% if sort == 'new' %}active{% endif %}">New</a>
+  </div>
+  <div class="tag-list">
+    <a href="{{ url_for('main.explore', sort=sort) }}" class="tag {% if not active_tag %}active{% endif %}">All</a>
+    {% for tag in tags %}
+      <a href="{{ url_for('main.explore', tag=tag.slug, sort=sort) }}"
+         class="tag {% if active_tag and active_tag.id == tag.id %}active{% endif %}">{{ tag.name }}</a>
+    {% endfor %}
+  </div>
+</div>
+
+{% if pairings.items %}
+  <div class="feed">
+    {% for pairing in pairings.items %}
+      <div class="pairing-card">
+        <a href="{{ url_for('pairings.view', slug=pairing.slug) }}" class="pairing-link">
+          <div class="pairing-items">{{ pairing.title }}</div>
+          {% if pairing.prep_note %}
+            <div class="pairing-prep">📌 {{ pairing.prep_note }}</div>
+          {% endif %}
+          <p class="pairing-desc">{{ pairing.description[:120] }}{% if pairing.description|length > 120 %}…{% endif %}</p>
+        </a>
+        <div class="pairing-meta">
+          <span class="stars">{{ pairing.stars_display() }}</span>
+          <span class="rating-count">{{ pairing.ratings.count() }}</span>
+          {% for tag in pairing.tags[:3] %}
+            <a href="{{ url_for('main.explore', tag=tag.slug) }}" class="tag">{{ tag.name }}</a>
+          {% endfor %}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  {% if pairings.has_next or pairings.has_prev %}
+    <div class="pagination">
+      {% if pairings.has_prev %}
+        <a href="{{ url_for('main.explore', page=pairings.prev_num, tag=active_tag.slug if active_tag else '', sort=sort) }}" class="btn btn--secondary">← Prev</a>
+      {% endif %}
+      {% if pairings.has_next %}
+        <a href="{{ url_for('main.explore', page=pairings.next_num, tag=active_tag.slug if active_tag else '', sort=sort) }}" class="btn btn--secondary">Next →</a>
+      {% endif %}
+    </div>
+  {% endif %}
+{% else %}
+  <div class="empty-state">
+    <p>No pairings in this category yet.</p>
+    <a href="{{ url_for('pairings.submit') }}" class="btn btn--primary">+ Add one</a>
+  </div>
+{% endif %}
+{% endblock %}

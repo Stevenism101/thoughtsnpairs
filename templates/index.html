@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Thoughts N' Pairs — Weird food combos that actually work{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1 class="page-title">Pairings</h1>
+  <p class="page-subtitle">Weird combos that actually work. Rate 'em. Add yours.</p>
+</div>
+
+<div class="sort-tabs">
+  <a href="{{ url_for('main.index', sort='new') }}" class="sort-tab {% if sort == 'new' %}active{% endif %}">New</a>
+  <a href="{{ url_for('main.index', sort='top') }}" class="sort-tab {% if sort == 'top' %}active{% endif %}">Top rated</a>
+  <a href="{{ url_for('main.index', sort='oldest') }}" class="sort-tab {% if sort == 'oldest' %}active{% endif %}">Oldest</a>
+</div>
+
+{% if pairings.items %}
+  <div class="feed">
+    {% for pairing in pairings.items %}
+      <div class="pairing-card">
+        <a href="{{ url_for('pairings.view', slug=pairing.slug) }}" class="pairing-link">
+          <div class="pairing-items">{{ pairing.title }}</div>
+          {% if pairing.prep_note %}
+            <div class="pairing-prep">📌 {{ pairing.prep_note }}</div>
+          {% endif %}
+          <p class="pairing-desc">{{ pairing.description[:120] }}{% if pairing.description|length > 120 %}…{% endif %}</p>
+        </a>
+        <div class="pairing-meta">
+          <span class="stars" title="{{ pairing.avg_rating|round(1) }} / 5">{{ pairing.stars_display() }}</span>
+          <span class="rating-count">{{ pairing.ratings.count() }}</span>
+          {% for tag in pairing.tags[:3] %}
+            <a href="{{ url_for('main.explore', tag=tag.slug) }}" class="tag">{{ tag.name }}</a>
+          {% endfor %}
+        </div>
+        {% set links = pairing.get_approved_links() %}
+        {% if links %}
+          <div class="affiliate-row">
+            {% for link in links[:2] %}
+              <a href="{{ url_for('api.affiliate_redirect', link_id=link.id) }}" class="affiliate-btn" target="_blank" rel="noopener noreferrer">🛒 {{ link.label }}</a>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+
+  {% if pairings.has_next or pairings.has_prev %}
+    <div class="pagination">
+      {% if pairings.has_prev %}
+        <a href="{{ url_for('main.index', page=pairings.prev_num, sort=sort) }}" class="btn btn--secondary">← Prev</a>
+      {% endif %}
+      {% if pairings.has_next %}
+        <a href="{{ url_for('main.index', page=pairings.next_num, sort=sort) }}" class="btn btn--secondary">Next →</a>
+      {% endif %}
+    </div>
+  {% endif %}
+{% else %}
+  <div class="empty-state">
+    <p>No pairings yet. Be the first.</p>
+    <a href="{{ url_for('pairings.submit') }}" class="btn btn--primary">+ Add a Pairing</a>
+  </div>
+{% endif %}
+{% endblock %}

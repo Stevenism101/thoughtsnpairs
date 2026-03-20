@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Moderation Queue — ThoughtsNPairs{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1 class="page-title">Moderation Queue</h1>
+  <p class="page-subtitle">{{ pairings|length }} pending</p>
+</div>
+
+{% if pairings %}
+  {% for pairing in pairings %}
+    <div class="mod-card">
+      <div class="mod-card__pairing">
+        <strong>{{ pairing.item_1 }} + {{ pairing.item_2 }}</strong>
+      </div>
+      <p class="mod-card__desc">{{ pairing.description }}</p>
+      <div class="mod-card__meta">
+        Submitted by <a href="{{ url_for('pairings.profile', username=pairing.author.username) }}">{{ pairing.author.username }}</a>
+        · {{ pairing.author.approved_pairing_count }} approved pairings
+        · {{ pairing.created_at.strftime('%b %d, %Y') }}
+      </div>
+      <div class="mod-card__actions">
+        <form method="POST" action="{{ url_for('admin.approve', pairing_id=pairing.id) }}" style="display:inline">
+          <button type="submit" class="btn btn--approve">Approve</button>
+        </form>
+        <form method="POST" action="{{ url_for('admin.reject', pairing_id=pairing.id) }}" style="display:inline">
+          <button type="submit" class="btn btn--reject">Reject</button>
+        </form>
+      </div>
+    </div>
+  {% endfor %}
+{% else %}
+  <div class="empty-state">
+    <p>Queue is clear.</p>
+  </div>
+{% endif %}
+{% endblock %}

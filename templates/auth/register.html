@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Join ThoughtsNPairs{% endblock %}
+{% block content %}
+<div class="auth-card">
+  <h1 class="auth-title">Join ThoughtsNPairs</h1>
+  <p class="auth-subtitle">Share weird food combos. Rate what others find. It's that simple.</p>
+  <form method="POST" action="{{ url_for('auth.register') }}">
+    <div class="form-group">
+      <label class="form-label" for="username">Username</label>
+      <input type="text" id="username" name="username" class="form-input"
+             autocomplete="username" required minlength="3" maxlength="80">
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="email">Email</label>
+      <input type="email" id="email" name="email" class="form-input"
+             autocomplete="email" required>
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="password">Password</label>
+      <input type="password" id="password" name="password" class="form-input"
+             autocomplete="new-password" required minlength="6">
+    </div>
+    <button type="submit" class="btn btn--primary btn--full">Create Account</button>
+  </form>
+  <p class="auth-switch">Already in? <a href="{{ url_for('auth.login') }}">Sign in</a></p>
+</div>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard — ThoughtsNPairs{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1 class="page-title">Dashboard</h1>
+</div>
+<div class="admin-stats">
+  <div class="stat-card">
+    <div class="stat-card__number">{{ pending }}</div>
+    <div class="stat-card__label">Pending</div>
+    <a href="{{ url_for('admin.queue') }}" class="stat-card__link">Review queue →</a>
+  </div>
+  <div class="stat-card">
+    <div class="stat-card__number">{{ approved }}</div>
+    <div class="stat-card__label">Approved</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-card__number">{{ total_users }}</div>
+    <div class="stat-card__label">Users</div>
+  </div>
+</div>
+
+<h2 class="section-title">Top Pairings by Views</h2>
+<div class="feed">
+  {% for pairing in top_pairings %}
+    <div class="pairing-card">
+      <a href="{{ url_for('pairings.view', slug=pairing.slug) }}" class="pairing-link">
+        <div class="pairing-items">{{ pairing.item_1 }} + {{ pairing.item_2 }}</div>
+        <div class="pairing-meta">
+          <span>{{ pairing.view_count }} views</span>
+          <span class="stars">{{ pairing.stars_display() }}</span>
+        </div>
+      </a>
+    </div>
+  {% endfor %}
+</div>
+
+<div class="admin-nav">
+  <a href="{{ url_for('admin.queue') }}" class="btn btn--secondary">Moderation Queue</a>
+  <a href="{{ url_for('admin.affiliate') }}" class="btn btn--secondary">Affiliate Manager</a>
+</div>
+{% endblock %}
