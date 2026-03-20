@@ -34,6 +34,7 @@ def create_app(config_name=None):
     with app.app_context():
         db.create_all()
         seed_tags()
+        seed_db()
 
     return app
 
@@ -167,6 +168,6 @@ def seed_db():
 
 if __name__ == '__main__':
     app = create_app()
-    with app.app_context():
-        seed_db()
+    # with app.app_context():
+    #     seed_db()
     app.run(debug=True)
