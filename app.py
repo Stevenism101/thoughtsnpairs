@@ -9,7 +9,7 @@ login_manager = LoginManager()
 
 def create_app(config_name=None):
     if config_name is None:
-        config_name = os.environ.get('FLASK_ENV', 'development')
+        config_name = os.environ.get('APP_ENV', 'development')
 
     app = Flask(__name__)
     app.config.from_object(config.get(config_name, config['default']))
@@ -34,6 +34,10 @@ def create_app(config_name=None):
     with app.app_context():
         db.create_all()
         seed_tags()
+        # Seed DB if admin user not exists
+        admin = User.query.filter_by(username='admin').first()
+        if not admin:
+            seed_db()
 
     return app
 
@@ -64,13 +68,11 @@ def seed_db():
     """Run this once to populate sample pairings."""
     from werkzeug.security import generate_password_hash
 
-    # Create admin user if not exists
-    admin = User.query.filter_by(username='admin').first()
-    if not admin:
-        admin = User(username='admin', email='admin@thoughtsnpairs.com', is_admin=True)
-        admin.set_password('admin123')
-        db.session.add(admin)
-        db.session.flush()
+    # Create admin user
+    admin = User(username='admin', email='admin@thoughtsnpairs.com', is_admin=True)
+    admin.set_password('admin123')
+    db.session.add(admin)
+    db.session.flush()
 
     sample_pairings = [
         {
@@ -167,6 +169,6 @@ def seed_db():
 
 if __name__ == '__main__':
     app = create_app()
-    with app.app_context():
-        seed_db()
+    # with app.app_context():
+    #     seed_db()
     app.run(debug=True)
