@@ -34,7 +34,6 @@ def create_app(config_name=None):
     with app.app_context():
         db.create_all()
         seed_tags()
-        # seed_db() ONLY RAN ONCE
 
     return app
 
