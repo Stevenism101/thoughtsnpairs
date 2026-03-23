@@ -9,7 +9,7 @@ login_manager = LoginManager()
 
 def create_app(config_name=None):
     if config_name is None:
-        config_name = os.environ.get('APP_ENV', 'development')
+        config_name = os.environ.get('FLASK_ENV', 'development')
 
     app = Flask(__name__)
     app.config.from_object(config.get(config_name, config['default']))
@@ -167,6 +167,6 @@ def seed_db():
 
 if __name__ == '__main__':
     app = create_app()
-    # with app.app_context():
-    #     seed_db()
+    with app.app_context():
+        seed_db()
     app.run(debug=True)
